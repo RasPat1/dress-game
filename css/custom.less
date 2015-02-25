@@ -1,0 +1,87 @@
+/******************************************************************************
+ App specific CSS file.  Compiles into custom.css.  Currently included in 
+ index.html.  For dist all css should be included in main.css.  
+
+ @requires Flexbox
+ ******************************************************************************/
+
+
+/******************************************************************************
+ Material UI imports
+ ******************************************************************************/
+@import "./material-ui/less/scaffolding.less";
+@import "./material-ui/less/components.less";
+
+/******************************************************************************
+ App
+ ******************************************************************************/
+
+body {
+	padding: 180px;
+	background: @light-blue-50;
+}
+.app {
+	width: 60%;
+	margin: 0px auto;
+	background: @orange-50;
+}
+.app__holder {
+	padding: 20px;
+}
+
+/******************************************************************************
+ Product Info
+ ******************************************************************************/
+.product {
+	padding: 20px;
+}
+.product__description {
+	margin: 20px auto;
+	.font-size(14px);
+}
+.product__photo-holder {
+	text-align: center;
+}
+
+/******************************************************************************
+ Button Holder
+ ******************************************************************************/
+.selection {
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 400px;
+	width: 80%;
+	justify-content: space-between;
+	margin: 0px auto;
+}
+.selection__middle-row {
+	order: 2;
+	width: 100%;
+}
+.selection__feature-btn {
+	width: 200px;
+	margin: 20px;
+}
+.selection__feature-btn--top {
+	order: 1;
+}
+.selection__feature-btn--left {
+	float: left;
+}
+.selection__feature-btn--right {
+	float: right;
+}
+.selection__feature-btn--bottom {
+	order: 4;
+}
+
+/******************************************************************************
+ Mixins
+ *****************************************************************************/
+.font-size(@font-size) {
+	@goldenRatio: 1.618;
+	font-size: @font-size;
+	line-height: @font-size * @goldenRatio;
+}

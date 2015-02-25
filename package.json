@@ -1,0 +1,24 @@
+{
+  "name": "DressUP",
+  "version": "1.0.0",
+  "description": "interal tool for categorizing products",
+  "main": "index.html",
+  "directories": {
+    "doc": "doc"
+  },
+  "dependencies": {
+    "jsx-loader": "^0.12.2",
+    "less": "^2.4.0",
+    "material-ui": "^0.7.0",
+    "webpack": "^1.5.3"
+  },
+  "devDependencies": {
+    "less-loader": "^2.0.0",
+    "watch-lessc": "0.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
