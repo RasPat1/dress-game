@@ -15,66 +15,69 @@
 /******************************************************************************
  App
  ******************************************************************************/
-
 body {
-	padding: 180px;
-	background: @light-blue-50;
+  padding: 10px;
+	background: @cyan-50;
 }
 .app {
-	width: 60%;
 	margin: 0px auto;
-	background: @orange-50;
+	background: white;
+  max-width: 800px;
 }
 .app__holder {
-	padding: 20px;
+	padding: 20px 30px;
+  text-align: center;
 }
 
 /******************************************************************************
  Product Info
  ******************************************************************************/
 .product {
-	padding: 20px;
+	padding: 30px;
+}
+.product__name {
+  margin: 10px auto 30px;
 }
 .product__description {
-	margin: 20px auto;
+	padding: 30px 20px 0px;
 	.font-size(14px);
 }
 .product__photo-holder {
 	text-align: center;
+}
+.product__photo {
+  width: 50%;
+  max-width: 525px;
 }
 
 /******************************************************************************
  Button Holder
  ******************************************************************************/
 .selection {
-	padding: 20px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	height: 400px;
-	width: 80%;
-	justify-content: space-between;
-	margin: 0px auto;
+	margin: 30px auto 20px;
+  justify-content: space-between;
+  height: 100px;
 }
-.selection__middle-row {
-	order: 2;
-	width: 100%;
+.selection__feature-btn-holder {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 .selection__feature-btn {
-	width: 200px;
-	margin: 20px;
+  width: 45%;
 }
-.selection__feature-btn--top {
-	order: 1;
-}
-.selection__feature-btn--left {
-	float: left;
-}
-.selection__feature-btn--right {
-	float: right;
-}
-.selection__feature-btn--bottom {
-	order: 4;
+
+/******************************************************************************
+ Media Queries
+ ******************************************************************************/
+@media all and (min-width: 768px) {
+  #content {
+    .vertical-align;
+  }
 }
 
 /******************************************************************************
@@ -84,4 +87,9 @@ body {
 	@goldenRatio: 1.618;
 	font-size: @font-size;
 	line-height: @font-size * @goldenRatio;
+}
+.vertical-align {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
