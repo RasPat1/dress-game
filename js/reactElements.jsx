@@ -1,6 +1,3 @@
-// Want to use this Css methodology
-// https://en.bem.info/
-
 var mui = require('material-ui'),
 	React = require('react/addons'),
 	injectTapEventPlugin = require('react-tap-event-plugin'),
@@ -40,8 +37,8 @@ var ProductImageSet = React.createClass({
 		if (this.props.imageUrls) {
 			return (
 					<div className="product__photo-holder">
-						<img className="product__photo--primary" src={this.props.imageUrls.primary} />
-						<img className="product__photo--secondary" src={this.props.imageUrls.secondary} />
+						<img className="product__photo" src={this.props.imageUrls.primary} />
+						<img className="product__photo" src={this.props.imageUrls.secondary} />
 					</div>
 				);
 		}
@@ -78,26 +75,23 @@ var Selection = React.createClass({
 		}
 	},
 	render: function() {
-
 		var features = [];
-		this.classDirection = "left";
 		if (this.props.features) {
-			features = 
-
-			this.props.features.map(function(feature) {
-				var className =  "selection__feature-btn selection__feature-btn--inline selection__feature-btn--" + this.classDirection;
-				this.classDirection = "right";
+			features = this.props.features.map(function(feature) {
+				var className =  "selection__feature-btn selection__feature-btn--primary";
 				return (<RaisedButton label={ feature.name } onClick={this.handleFeatureClick(feature.id).bind(this)} key={feature.name} primary={true} className={className} />);
 			}, this);
 		}
 
 		return (
 			<div className="selection">
-				<RaisedButton label="Both" onClick={this.handleClickBoth} key="both" secondary={true} className="selection__feature-btn selection__feature-btn--top"/>
-				<div className="selection__middle-row">
+				<div className="selection__feature-btn-holder selection__feature-btn-holder--top">
 					{ features }
 				</div>
-				<RaisedButton label="Neither" onClick={this.handleClickNeither} key="neither" secondary={true} className="selection__feature-btn selection__feature-btn--bottom"/>
+				<div className="selection__feature-btn-holder selection__feature-btn-holder--bottom">
+					<FlatButton label="Both" onClick={this.handleClickBoth} key="both" secondary={true} className="selection__feature-btn selection__feature-btn--secondary"/>
+					<FlatButton label="Neither" onClick={this.handleClickNeither} key="neither" primary={true} className="selection__feature-btn selection__feature-btn--secondary"/>
+				</div>
 			</div>
 		);
 	}
@@ -145,6 +139,9 @@ var DressApp = React.createClass({
 				url: this.props.url,
 				dataType: "json",
 				data: data,
+				xhrFields: {
+					withCredentials: true
+				},
 				success: function(data) {
 				
 				}.bind(this),
@@ -171,15 +168,7 @@ var DressApp = React.createClass({
 		var selectionProps = {};
 		if (data.product && data.features) {
 			selectionProps.productId = data.product.id;
-			// loop through the features and add them to features
 			selectionProps.features = data.features;
-			// for (var feature in data.feature) {
-			// 	var featureProps = {};
-			// 	featureProps.id = feature.id;
-			// 	featureProps.name = feature.name;
-			// 	selectionProps.features.push(featureProps);
-			// }
-
 		}
 
 		this.setState({product: productProps, selection:selectionProps});
