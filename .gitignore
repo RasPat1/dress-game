@@ -2,3 +2,6 @@
 # Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
 bower_components
 node_modules
+*.map
+js/main.js
+css/custom.css
