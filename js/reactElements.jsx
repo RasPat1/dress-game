@@ -3,7 +3,8 @@ var mui = require('material-ui'),
 	injectTapEventPlugin = require('react-tap-event-plugin'),
 	RaisedButton = mui.RaisedButton,
 	FlatButton = mui.FlatButton,
-	Paper = mui.Paper;
+	Paper = mui.Paper,
+	url = "//localhost:8080/api/dressGame/interaction";
 
 injectTapEventPlugin();
 
@@ -23,7 +24,7 @@ var Product = React.createClass({
 	        <h2 className="product__name">{this.props.name}</h2>
 	        <ProductImageSet className="product__image-set" imageUrls={this.props.imageUrls} />
 	        <div className="product__price">{this.props.price}</div>
-	        <div className="product__description" dangerouslySetInnerHTML={{__html: this.props.description}}></div>
+	        <div className="product__description" dangerolySetInnerHTML={{__html: this.props.description}}></div>
 	      </div>
 	      );
 	} else {
@@ -112,7 +113,9 @@ var DressApp = React.createClass({
 		$.ajax({
 			url: this.props.url,
 			dataType: "json",
-			data: {userId: this.props.userId},
+			xhrFields: {
+				withCredentials: true
+			},
 			success: function(data) {
 					this.setPropObjects(data);
 			}.bind(this),
@@ -127,12 +130,10 @@ var DressApp = React.createClass({
 		for (var index in featureDecisions) {
 			var featureDecision = featureDecisions[index];
 			var data = {
-					productId: productId,
-					productFeatureId: featureDecision.featureId,
-					decision: featureDecision.decision,
-					// Remove the userId Requirement when authentication works
-					userId: this.props.userId
-				};
+				productId: productId,
+				productFeatureId: featureDecision.featureId,
+				decision: featureDecision.decision,
+			};
 
 			$.ajax({
 				type: "POST",
@@ -184,6 +185,6 @@ var DressApp = React.createClass({
 });
 
 React.render(
-  <DressApp url="//localhost:8080/api/dressGame/interaction" userId="129534" />, 
+  <DressApp url={url} />, 
   document.getElementById('content')
 );
