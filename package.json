@@ -13,12 +13,11 @@
     "webpack": "^1.5.3"
   },
   "devDependencies": {
-    "less-loader": "^2.0.0",
-    "watch-lessc": "0.0.2"
+    "less-loader": "^2.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Rasesh Patel",
   "license": "ISC"
 }
