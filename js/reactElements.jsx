@@ -1,10 +1,10 @@
 var mui = require('material-ui'),
-	React = require('react/addons'),
+	React = require('react'),
 	injectTapEventPlugin = require('react-tap-event-plugin'),
 	RaisedButton = mui.RaisedButton,
 	FlatButton = mui.FlatButton,
 	Paper = mui.Paper,
-	url = "//localhost:8080/api/dressGame/interaction";
+	url = "https://shoptiques.com/api/dressGame/interaction";
 
 injectTapEventPlugin();
 
