@@ -2627,10 +2627,39 @@ body {
   margin: 0px auto;
   background: white;
   max-width: 800px;
+  position: relative;
 }
 .app__holder {
   padding: 20px 30px;
   text-align: center;
+}
+/******************************************************************************
+ Login Modal
+ ******************************************************************************/
+.login-modal--logged-in {
+  display: none;
+}
+.login-modal {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  z-index: 2;
+}
+.login-modal__holder {
+  background: #fafafa;
+  padding: 20px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.login-modal__form {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
 }
 /******************************************************************************
  Product Info
@@ -2683,6 +2712,18 @@ body {
     transform: translateY(-50%);
   }
 }
+@media all and (max-width: 767px) {
+  .login-modal .login-modal__holder {
+    height: auto;
+  }
+  .login-modal__form {
+    flex-direction: column;
+    height: 200px;
+  }
+}
+/******************************************************************************
+ Variables
+ ******************************************************************************/
 /******************************************************************************
  Mixins
  *****************************************************************************/
