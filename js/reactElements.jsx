@@ -4,29 +4,63 @@ var mui = require('material-ui'),
 	RaisedButton = mui.RaisedButton,
 	FlatButton = mui.FlatButton,
 	Paper = mui.Paper,
-	url = "https://shoptiques.com/api/dressGame/interaction";
+	TextField = mui.TextField,
+	url = "https://shoptiques.com/api/dressGame/interaction",
+	loginUrl = "https://shoptiques.com/api/v1/login";
 
 injectTapEventPlugin();
 
-var FeatureTitle = React.createClass({
+var LoginModal = React.createClass({
+	componentDidMount: function() {
+		this.refs.email.focus();
+	},
+	handleSubmit: function(e) {
+		e.preventDefault();
+		var email = this.refs.email.getValue();
+		var password = this.refs.password.getValue();
+		if (!email || !password) {
+			return;
+		}
+		this.props.handleLogin(email, password);
+		this.refs.email.getDOMNode().value = "";
+		this.refs.password.getDOMNode().value = "";
+	},
+	getClassName: function() {
+		var className = "login-modal";
+		if (this.props.loggedIn) {
+			className += " login-modal--logged-in";
+		}
+		return className;
+	},
 	render: function() {
-		return typeof this.props.name !== "undefined" ?
-			 (<h1 className="feature__name">{this.props.name}</h1>) :
-			 (<h1 className="feature__name feature__name--empty">No Feaure Yet</h1>);
+		return (
+		<Paper zDepth={4} className={this.getClassName()}
+		 innerClassName="login-modal__holder">
+			<h3 className="login-modal__title">LOG IN!</h3>
+			<form className="login-modal__form" onSubmit={this.handleSubmit}>
+				<TextField className="login-modal__email"
+				 hintText="Email" ref="email" type="email" />
+  				<TextField className="login-modal__password"
+  				 hintText="Password" ref="password" type="password" />
+				<RaisedButton className="login-modal__submit" 
+				 label="Log In" secondary={true} />
+			</form>
+		</Paper>
+		);
 	}
 });
 
 var Product = React.createClass({
   render: function() {
-  	if (this.props.id) {
-	    return (
-	      <div className="product__holder">
-	        <h2 className="product__name">{this.props.name}</h2>
-	        <ProductImageSet className="product__image-set" imageUrls={this.props.imageUrls} />
-	        <div className="product__price">{this.props.price}</div>
-	        <div className="product__description" dangerolySetInnerHTML={{__html: this.props.description}}></div>
-	      </div>
-	      );
+	if (this.props.id) {
+		return (
+		  <div className="product__holder">
+			<h2 className="product__name">{this.props.name}</h2>
+			<ProductImageSet className="product__image-set" imageUrls={this.props.imageUrls} />
+			<div className="product__price">{this.props.price}</div>
+			<div className="product__description" dangerolySetInnerHTML={{__html: this.props.description}}></div>
+		  </div>
+		  );
 	} else {
 		return (<h2 className="product__name">No Product</h2>);
 	}
@@ -101,20 +135,49 @@ var Selection = React.createClass({
 
 
 var DressApp = React.createClass({
+	/******************************************************************************
+	 Log in Logic
+	 ******************************************************************************/
+
+	handleLogin: function(email, password) {
+		var data = {username: email, password: password};
+		$.ajax({
+				type: "POST",
+				url: this.props.loginUrl,
+				data: data,
+				success: function(data) {
+					this.setState({authToken: data.access_token}, this.getNextData);
+				}.bind(this),
+				error: function(xhr, status, error) {
+					this.setState({authToken: null});
+					console.error(this.props.loginUrl, status, err.toString());
+				}.bind(this)
+			});
+	},
+	checkLogin: function() {
+		// TODO
+		// Check if user is logged in
+		// Store the auth otken in local storage and check that
+	},
+
+	/******************************************************************************
+	 Application Logic
+	 ******************************************************************************/
+	
 	getInitialState: function() {
-		this.getNextData();
-		return {product: null, feature: null, selection: null};
+		return {product: null, selection: null, authToken: null};
 	},
 	getNextData: function(fails) {
 		fails = typeof fails == 'undefined' ? 0 : fails
 		if (fails > 5) {
 			return;
 		}
+		var authToken = this.state.authToken;
 		$.ajax({
 			url: this.props.url,
 			dataType: "json",
-			xhrFields: {
-				withCredentials: true
+			beforeSend: function (request) {
+				request.setRequestHeader("X-Auth-Token", authToken);
 			},
 			success: function(data) {
 					this.setPropObjects(data);
@@ -134,17 +197,17 @@ var DressApp = React.createClass({
 				productFeatureId: featureDecision.featureId,
 				decision: featureDecision.decision,
 			};
-
+			var authToken = this.state.authToken;
 			$.ajax({
 				type: "POST",
 				url: this.props.url,
 				dataType: "json",
 				data: data,
-				xhrFields: {
-					withCredentials: true
-				},
-				success: function(data) {
-				
+				beforeSend: function (request) {
+	                request.setRequestHeader("X-Auth-Token", authToken);
+	            },
+	            success: function(data) {
+
 				}.bind(this),
 				error: function(xhr, status, error) {
 					console.error(this.props.url, status, err.toString());
@@ -177,6 +240,7 @@ var DressApp = React.createClass({
 	render: function() {
 		return (
 			<Paper zDepth={2} className="app" innerClassName="app__holder">
+				<LoginModal loggedIn={this.state.authToken ? true : false} handleLogin={this.handleLogin} />
 				<Product {...this.state.product} className="product" />
 				<Selection {...this.state.selection} sendInteraction={this.sendInteraction} className="selection" />
 			</Paper>
@@ -185,6 +249,6 @@ var DressApp = React.createClass({
 });
 
 React.render(
-  <DressApp url={url} />, 
+  <DressApp url={url} loginUrl={loginUrl} />, 
   document.getElementById('content')
 );

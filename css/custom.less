@@ -12,21 +12,53 @@
 @import "./material-ui/less/scaffolding.less";
 @import "./material-ui/less/components.less";
 
+
 /******************************************************************************
  App
  ******************************************************************************/
 body {
   padding: 10px;
-	background: @cyan-50;
+	background: @primary-background;
 }
 .app {
 	margin: 0px auto;
 	background: white;
   max-width: 800px;
+  position: relative;
 }
 .app__holder {
 	padding: 20px 30px;
   text-align: center;
+}
+
+
+/******************************************************************************
+ Login Modal
+ ******************************************************************************/
+.login-modal--logged-in {
+  display: none;
+ }
+.login-modal {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  z-index: 2;
+}
+.login-modal__holder {
+  background: @grey-50;
+  padding: 20px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.login-modal__form {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
 }
 
 /******************************************************************************
@@ -50,6 +82,7 @@ body {
   max-width: 525px;
 }
 
+
 /******************************************************************************
  Button Holder
  ******************************************************************************/
@@ -71,6 +104,7 @@ body {
   width: 45%;
 }
 
+
 /******************************************************************************
  Media Queries
  ******************************************************************************/
@@ -79,6 +113,22 @@ body {
     .vertical-align;
   }
 }
+@media all and (max-width: 767px) {
+  .login-modal .login-modal__holder {
+    height: auto;
+  }
+  .login-modal__form {
+    flex-direction: column;
+    height: 200px;
+  }
+}  
+
+/******************************************************************************
+ Variables
+ ******************************************************************************/
+@primary-background: @cyan-50;
+@secondary-background: @grey-50;
+
 
 /******************************************************************************
  Mixins
