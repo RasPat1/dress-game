@@ -150,7 +150,7 @@ var DressApp = React.createClass({
 				}.bind(this),
 				error: function(xhr, status, error) {
 					this.setState({authToken: null});
-					console.error(this.props.loginUrl, status, err.toString());
+					console.error(this.props.loginUrl, status, error.toString());
 				}.bind(this)
 			});
 	},
@@ -210,7 +210,7 @@ var DressApp = React.createClass({
 
 				}.bind(this),
 				error: function(xhr, status, error) {
-					console.error(this.props.url, status, err.toString());
+					console.error(this.props.url, status, error.toString());
 				}.bind(this)
 			});
 		}
