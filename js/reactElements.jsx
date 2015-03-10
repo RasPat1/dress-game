@@ -5,8 +5,8 @@ var mui = require('material-ui'),
 	FlatButton = mui.FlatButton,
 	Paper = mui.Paper,
 	TextField = mui.TextField,
-	url = "https://shoptiques.com/api/dressGame/interaction",
-	loginUrl = "https://shoptiques.com/api/v1/login";
+	url = "https://www.shoptiques.com/api/dressGame/interaction",
+	loginUrl = "https://www.shoptiques.com/api/v1/login";
 
 injectTapEventPlugin();
 
@@ -151,6 +151,7 @@ var DressApp = React.createClass({
 				error: function(xhr, status, error) {
 					this.setState({authToken: null});
 					console.error(this.props.loginUrl, status, error.toString());
+					alert("Yikes! Login Failed");
 				}.bind(this)
 			});
 	},
