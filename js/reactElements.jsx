@@ -6,8 +6,8 @@ var mui = require('material-ui'),
 	Paper = mui.Paper,
 	TextField = mui.TextField,
 	Dialog = mui.Dialog,
-	url = "http://localhost:8080/api/dressGame/interaction",
-	loginUrl = "http://localhost:8080/api/v1/login";
+	url = "https://www.shoptiques.com/api/dressGame/interaction",
+	loginUrl = "https://www.shoptiques.com/api/v1/login";
 
 injectTapEventPlugin();
 
@@ -21,8 +21,12 @@ var LoadingOverlay = React.createClass({
 	},
 	render: function() {
 		return (
-			<Dialog ref="loading" title="Loading..." className={"loading__parent loading__parent--" + this.props.loading}>
-				The loading spinner?
+			<Dialog ref="loading" title="Loading" className={"loading__parent loading__parent--" + this.props.loading} contentClassName="loading__content">
+				<div className="loading__loader">
+				    <svg className="circular">
+				        <circle className="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+				    </svg>
+				</div>
 			</Dialog>
 			)
 	}
