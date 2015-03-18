@@ -5,10 +5,28 @@ var mui = require('material-ui'),
 	FlatButton = mui.FlatButton,
 	Paper = mui.Paper,
 	TextField = mui.TextField,
-	url = "https://www.shoptiques.com/api/dressGame/interaction",
-	loginUrl = "https://www.shoptiques.com/api/v1/login";
+	Dialog = mui.Dialog,
+	url = "http://localhost:8080/api/dressGame/interaction",
+	loginUrl = "http://localhost:8080/api/v1/login";
 
 injectTapEventPlugin();
+
+var LoadingOverlay = React.createClass({
+	componentWillUpdate: function() {
+		if (this.props.loading) {
+			this.refs.loading.show();
+		} else {
+			this.refs.loading.dismiss();
+		}
+	},
+	render: function() {
+		return (
+			<Dialog ref="loading" title="Loading..." className={"loading__parent loading__parent--" + this.props.loading}>
+				The loading spinner?
+			</Dialog>
+			)
+	}
+})
 
 var LoginModal = React.createClass({
 	componentDidMount: function() {
@@ -139,7 +157,14 @@ var DressApp = React.createClass({
 	LifeCycle
 	******************************************************************************/
 	getInitialState: function() {
-		return {interactionQueue: [], product: null, selection: null, authToken: null};
+		return {
+			interactionQueue: [],
+			product: null,
+			selection: null,
+			authToken: null,
+			loading: true,
+			requesting: false
+		};
 	},
 	componentDidMount: function() {
 		this.checkLogin();
@@ -152,6 +177,7 @@ var DressApp = React.createClass({
 			if (data) {
 				this.enqueueData(data);
 				this.dequeueData();
+				this.setState({loading: false});
 			}
 		}.bind(this));
 	},
@@ -177,7 +203,7 @@ var DressApp = React.createClass({
 		this.setPropObjects(interaction);
 
 		// If the queue is running low grab more data
-		if (this.state.interactionQueue.length < 20) {
+		if (this.state.interactionQueue.length < 15 && !this.state.requesting) {
 			this.getNextData();
 		}
 	},
@@ -223,16 +249,17 @@ var DressApp = React.createClass({
 		if (fails > 2) {
 			return;
 		}
-
+		this.setState({requesting: true});
 		$.ajax({
 			url: this.props.url,
-			data: {count: 20},
+			data: {count: 30},
 			dataType: "json",
 			beforeSend: function (request) {
 				request.setRequestHeader("X-Auth-Token", this.state.authToken);
 			}.bind(this),
 			success: function(data) {
 				callback(data)
+				this.setState({requesting:false})
 			}.bind(this),
 			statusCode: {
 				401: function() {
@@ -309,7 +336,8 @@ var DressApp = React.createClass({
 	render: function() {
 		return (
 			<Paper zDepth={2} className="app" innerClassName="app__holder">
-				<LoginModal loggedIn={this.state.authToken ? true : false} handleLogin={this.handleLogin}/>
+				<LoadingOverlay loading={this.state.loading} />
+				<LoginModal loggedIn={this.state.authToken ? true : false} handleLogin={this.handleLogin} />
 				<Product {...this.state.product} className="product" />
 				<Selection {...this.state.selection} updateProduct={this.updateProduct} className="selection" />
 			</Paper>
