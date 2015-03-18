@@ -24,7 +24,7 @@ var LoadingOverlay = React.createClass({
 			<Dialog ref="loading" title="Loading" className={"loading__parent loading__parent--" + this.props.loading} contentClassName="loading__content">
 				<div className="loading__loader">
 				    <svg className="circular">
-				        <circle className="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+				        <circle className="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/>
 				    </svg>
 				</div>
 			</Dialog>
