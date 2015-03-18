@@ -31,6 +31,12 @@ body {
   text-align: center;
 }
 
+/******************************************************************************
+ Loading Overlay
+ ******************************************************************************/
+.loading__parent {
+  .full-size(3);
+}
 
 /******************************************************************************
  Login Modal
@@ -39,12 +45,7 @@ body {
   display: none;
  }
 .login-modal {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  right: 0px;
-  left: 0px;
-  z-index: 2;
+  .full-size(2);
 }
 .login-modal__holder {
   background: @grey-50;
@@ -114,8 +115,12 @@ body {
   #content {
     .vertical-align;
   }
+  .loading__parent .mui-overlay {  // YIKES!
+    background-color: transparent;
+  }
 }
 @media all and (max-width: 767px) {
+
   .login-modal .login-modal__holder {
     height: auto;
   }
@@ -144,4 +149,12 @@ body {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
+}
+.full-size(@z-index) {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  z-index: @z-index;
 }
