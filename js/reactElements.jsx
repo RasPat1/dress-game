@@ -197,6 +197,7 @@ var DressApp = React.createClass({
 			success: function(data) {
 				this.setState({authToken: data.access_token}, this.dequeueData);
 				localStorage.setItem('dress-auth-token', data.access_token);
+				localStrorage.setItem('dress-auth-date', new Date().getTime());
 			}.bind(this),
 			error: function(xhr, status, error) {
 				this.setState({authToken: null});
@@ -206,7 +207,8 @@ var DressApp = React.createClass({
 		});
 	},
 	checkLogin: function() {
-		var authToken = localStorage.getItem('dress-auth-token')
+		var authToken = localStorage.getItem('dress-auth-token');
+		var date = localStorage.getItem('dress-auth-date');
 		if (authToken) {
 			this.setState({authToken: authToken});
 		}
@@ -231,6 +233,13 @@ var DressApp = React.createClass({
 			success: function(data) {
 				callback(data)
 			}.bind(this),
+			statusCode: {
+				401: function() {
+					localStorage.removeItem('dress-auth-token');
+					localStorage.removeItem('dress-auth-date');
+					this.setState({authToken: null});
+				}.bind(this)
+			},
 			error: function(xhr, status, error) {
 				console.error(this.props.url, status, error);
 				fails++;
