@@ -12,7 +12,6 @@ injectTapEventPlugin();
 
 var LoginModal = React.createClass({
 	componentDidMount: function() {
-		this.props.checkLogin();
 		this.refs.email.focus();
 	},
 	handleSubmit: function(e) {
@@ -143,15 +142,17 @@ var DressApp = React.createClass({
 		return {interactionQueue: [], product: null, selection: null, authToken: null};
 	},
 	componentDidMount: function() {
-		this.getInitialData();
+		this.checkLogin();
 	},
    /******************************************************************************
 	Application Logic
 	******************************************************************************/
 	getInitialData: function() {
 		this.requestData(function(data) {
-			this.enqueueData(data);
-			this.dequeueData();
+			if (data) {
+				this.enqueueData(data);
+				this.dequeueData();
+			}
 		}.bind(this));
 	},
 	getNextData: function() {
@@ -176,7 +177,7 @@ var DressApp = React.createClass({
 		this.setPropObjects(interaction);
 
 		// If the queue is running low grab more data
-		if (this.state.interactionQueue.length < 10) {
+		if (this.state.interactionQueue.length < 20) {
 			this.getNextData();
 		}
 	},
@@ -195,13 +196,13 @@ var DressApp = React.createClass({
 			url: this.props.loginUrl,
 			data: data,
 			success: function(data) {
-				this.setState({authToken: data.access_token}, this.dequeueData);
+				this.setState({authToken: data.access_token}, this.getInitialData);
 				localStorage.setItem('dress-auth-token', data.access_token);
-				localStrorage.setItem('dress-auth-date', new Date().getTime());
+				localStorage.setItem('dress-auth-date', new Date().getTime());
 			}.bind(this),
 			error: function(xhr, status, error) {
 				this.setState({authToken: null});
-				console.error(this.props.login-modalUrl, status, error.toString());
+				console.error(this.props.loginUrl, status, error.toString());
 				alert("Yikes! Login Failed");
 			}.bind(this)
 		});
@@ -210,7 +211,7 @@ var DressApp = React.createClass({
 		var authToken = localStorage.getItem('dress-auth-token');
 		var date = localStorage.getItem('dress-auth-date');
 		if (authToken) {
-			this.setState({authToken: authToken});
+			this.setState({authToken: authToken}, this.getInitialData);
 		}
 	},
 
@@ -219,7 +220,7 @@ var DressApp = React.createClass({
 	*******************************************************************************/
 	requestData: function(callback, fails) {
 		fails = typeof fails == 'undefined' ? 0 : fails
-		if (fails > 5) {
+		if (fails > 2) {
 			return;
 		}
 
@@ -241,6 +242,8 @@ var DressApp = React.createClass({
 				}.bind(this)
 			},
 			error: function(xhr, status, error) {
+				localStorage.removeItem('dress-auth-token');
+				localStorage.removeItem('dress-auth-date');
 				console.error(this.props.url, status, error);
 				fails++;
 				this.requestData(callback, fails);
@@ -286,7 +289,7 @@ var DressApp = React.createClass({
 		// go onto the elements to make sure there are no namespacing conflicts.
 		var productProps = {imageUrls: {}}
 		var emptySrc = '';
-		if (data.product) {
+		if (data && data.product) {
 			productProps.name = data.product.name;
 			productProps.price = data.product.filterPriceUS;
 			productProps.description = data.product.description;
@@ -296,7 +299,7 @@ var DressApp = React.createClass({
 		}
 
 		var selectionProps = {};
-		if (data.product && data.features) {
+		if (data && data.product && data.features) {
 			selectionProps.productId = data.product.id;
 			selectionProps.features = data.features;
 		}
@@ -306,7 +309,7 @@ var DressApp = React.createClass({
 	render: function() {
 		return (
 			<Paper zDepth={2} className="app" innerClassName="app__holder">
-				<LoginModal loggedIn={this.state.authToken ? true : false} handleLogin={this.handleLogin} checkLogin={this.checkLogin} />
+				<LoginModal loggedIn={this.state.authToken ? true : false} handleLogin={this.handleLogin}/>
 				<Product {...this.state.product} className="product" />
 				<Selection {...this.state.selection} updateProduct={this.updateProduct} className="selection" />
 			</Paper>
