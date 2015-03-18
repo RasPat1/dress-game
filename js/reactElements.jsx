@@ -12,6 +12,7 @@ injectTapEventPlugin();
 
 var LoginModal = React.createClass({
 	componentDidMount: function() {
+		this.props.checkLogin();
 		this.refs.email.focus();
 	},
 	handleSubmit: function(e) {
@@ -56,8 +57,8 @@ var Product = React.createClass({
 		return (
 		  <div className="product__holder">
 			<h2 className="product__name">{this.props.name}</h2>
-			<ProductImageSet className="product__image-set" imageUrls={this.props.imageUrls} />
 			<div className="product__price">{this.props.price}</div>
+			<ProductImageSet className="product__image-set" imageUrls={this.props.imageUrls} />
 			<div className="product__description" dangerolySetInnerHTML={{__html: this.props.description}}></div>
 		  </div>
 		  );
@@ -86,14 +87,14 @@ var Selection = React.createClass({
 		for (var index in this.props.features) {
 			featureArray.push({featureId: this.props.features[index].id, decision: "true"});
 		}
-		this.props.sendInteraction(this.props.productId, featureArray);
+		this.props.updateProduct(this.props.productId, featureArray);
 	},
 	handleClickNeither: function() {
 		var featureArray = [];
 		for (var index in this.props.features) {
 			featureArray.push({featureId: this.props.features[index].id, decision: "false"});
 		}
-		this.props.sendInteraction(this.props.productId, featureArray);
+		this.props.updateProduct(this.props.productId, featureArray);
 	},
 	handleFeatureClick: function(featureId) {
 		return function() {
@@ -106,7 +107,7 @@ var Selection = React.createClass({
 				}
 				featureArray.push({featureId: buttonPropId, decision: decision});
 			}
-			this.props.sendInteraction(this.props.productId, featureArray);
+			this.props.updateProduct(this.props.productId, featureArray);
 		}
 	},
 	render: function() {
@@ -135,78 +136,120 @@ var Selection = React.createClass({
 
 
 var DressApp = React.createClass({
-	/******************************************************************************
-	 Log in Logic
-	 ******************************************************************************/
+   /******************************************************************************
+	LifeCycle
+	******************************************************************************/
+	getInitialState: function() {
+		return {interactionQueue: [], product: null, selection: null, authToken: null};
+	},
+	componentDidMount: function() {
+		this.getInitialData();
+	},
+   /******************************************************************************
+	Application Logic
+	******************************************************************************/
+	getInitialData: function() {
+		this.requestData(function(data) {
+			this.enqueueData(data);
+			this.dequeueData();
+		}.bind(this));
+	},
+	getNextData: function() {
+		this.requestData(function(data) {
+			this.enqueueData(data);
+		}.bind(this));
+	},
+	enqueueData: function(data) {
+		var interactionQueue = this.state.interactionQueue;
+		for (var i = 0; i < data.interactions.length; i++) {
+			interactionQueue.unshift(data.interactions[i]);
+		}
+		this.setState({'interactionQueue': interactionQueue});
+	},
+	dequeueData: function() {
+		// Grab the front of the queue and save the modified queue
+		var interactionQueue = this.state.interactionQueue;
+		var interaction = interactionQueue.shift();
+		this.setState({'interactionQueue': interactionQueue});
 
+		// update the state with the newly dequeued product
+		this.setPropObjects(interaction);
+
+		// If the queue is running low grab more data
+		if (this.state.interactionQueue.length < 10) {
+			this.getNextData();
+		}
+	},
+	updateProduct: function(id, featureArray) {
+		this.dequeueData()
+		this.sendInteraction(id, featureArray)
+	},
+
+   /******************************************************************************
+	Log in Logic
+	******************************************************************************/
 	handleLogin: function(email, password) {
 		var data = {username: email, password: password};
 		$.ajax({
-				type: "POST",
-				url: this.props.loginUrl,
-				data: data,
-				success: function(data) {
-					this.setState({authToken: data.access_token}, this.getNextData);
-				}.bind(this),
-				error: function(xhr, status, error) {
-					this.setState({authToken: null});
-					console.error(this.props.loginUrl, status, error.toString());
-					alert("Yikes! Login Failed");
-				}.bind(this)
-			});
+			type: "POST",
+			url: this.props.loginUrl,
+			data: data,
+			success: function(data) {
+				this.setState({authToken: data.access_token}, this.dequeueData);
+				localStorage.setItem('dress-auth-token', data.access_token);
+			}.bind(this),
+			error: function(xhr, status, error) {
+				this.setState({authToken: null});
+				console.error(this.props.login-modalUrl, status, error.toString());
+				alert("Yikes! Login Failed");
+			}.bind(this)
+		});
 	},
 	checkLogin: function() {
-		// TODO
-		// Check if user is logged in
-		// Store the auth otken in local storage and check that
+		var authToken = localStorage.getItem('dress-auth-token')
+		if (authToken) {
+			this.setState({authToken: authToken});
+		}
 	},
 
-	/******************************************************************************
-	 Application Logic
-	 ******************************************************************************/
-	
-	getInitialState: function() {
-		return {product: null, selection: null, authToken: null};
-	},
-	getNextData: function(fails) {
+   /*******************************************************************************
+	Requests
+	*******************************************************************************/
+	requestData: function(callback, fails) {
 		fails = typeof fails == 'undefined' ? 0 : fails
 		if (fails > 5) {
 			return;
 		}
-		var authToken = this.state.authToken;
+
 		$.ajax({
 			url: this.props.url,
+			data: {count: 20},
 			dataType: "json",
 			beforeSend: function (request) {
-				request.setRequestHeader("X-Auth-Token", authToken);
-			},
+				request.setRequestHeader("X-Auth-Token", this.state.authToken);
+			}.bind(this),
 			success: function(data) {
-					this.setPropObjects(data);
+				callback(data)
 			}.bind(this),
 			error: function(xhr, status, error) {
 				console.error(this.props.url, status, error);
 				fails++;
-				this.getNextData(fails);
+				this.requestData(callback, fails);
 			}.bind(this)
 		});
 	},
 	sendInteraction: function(productId, featureDecisions) {
 		for (var index in featureDecisions) {
-			var featureDecision = featureDecisions[index];
-			var data = {
-				productId: productId,
-				productFeatureId: featureDecision.featureId,
-				decision: featureDecision.decision,
-			};
-			var authToken = this.state.authToken;
+			var data = this.formatRequestData(productId, featureDecisions[index]);
+
 			$.ajax({
 				type: "POST",
 				url: this.props.url,
 				dataType: "json",
 				data: data,
 				beforeSend: function (request) {
-	                request.setRequestHeader("X-Auth-Token", authToken);
-	            },
+	                request.setRequestHeader("X-Auth-Token", this.state.authToken);
+	            }.bind(this),
 	            success: function(data) {
 
 				}.bind(this),
@@ -215,19 +258,32 @@ var DressApp = React.createClass({
 				}.bind(this)
 			});
 		}
-		this.getNextData();
+	},
+
+   /******************************************************************************
+	Formatting data
+	******************************************************************************/
+	formatRequestData: function(productId, featureDecision) {
+		var data = {
+			productId: productId,
+			productFeatureId: featureDecision.featureId,
+			decision: featureDecision.decision,
+		};
+		return data;
 	},
 	setPropObjects: function(data) {
 		// extract the properties we want.
 		// Since we're using props we want explicit control of which values 
 		// go onto the elements to make sure there are no namespacing conflicts.
-		var productProps = {}
+		var productProps = {imageUrls: {}}
+		var emptySrc = '';
 		if (data.product) {
 			productProps.name = data.product.name;
-			productProps.price = data.product.price;
+			productProps.price = data.product.filterPriceUS;
 			productProps.description = data.product.description;
 			productProps.id = data.product.id;
-			productProps.imageUrls = data.imageUrls;
+			productProps.imageUrls.primary = data.imageUrls.primary ? data.imageUrls.primary : emptySrc;
+			productProps.imageUrls.secondary = data.imageUrls.secondary ? data.imageUrls.secondary : emptySrc;
 		}
 
 		var selectionProps = {};
@@ -241,9 +297,9 @@ var DressApp = React.createClass({
 	render: function() {
 		return (
 			<Paper zDepth={2} className="app" innerClassName="app__holder">
-				<LoginModal loggedIn={this.state.authToken ? true : false} handleLogin={this.handleLogin} />
+				<LoginModal loggedIn={this.state.authToken ? true : false} handleLogin={this.handleLogin} checkLogin={this.checkLogin} />
 				<Product {...this.state.product} className="product" />
-				<Selection {...this.state.selection} sendInteraction={this.sendInteraction} className="selection" />
+				<Selection {...this.state.selection} updateProduct={this.updateProduct} className="selection" />
 			</Paper>
 			);
 	}
