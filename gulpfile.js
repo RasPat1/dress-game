@@ -4,6 +4,7 @@ var autoprefixer = require('gulp-autoprefixer');
 // var watch = require('gulp-watch');
 // var path = require('path');
 // var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 
 
 gulp.task('default', function () {
@@ -13,6 +14,12 @@ gulp.task('default', function () {
             cascade: false
         }))
         .pipe(gulp.dest('css'));
+});
+
+gulp.task('compress', function() {
+	return gulp.src('js/main.js')
+		.pipe(uglify())
+		.pipe(gulp.dest('js/'))
 });
 
 // Set this up later
