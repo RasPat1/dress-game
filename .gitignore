@@ -5,3 +5,4 @@ node_modules
 *.map
 js/main.js
 css/custom.css
+.DS_STORE
