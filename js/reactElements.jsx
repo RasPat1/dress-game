@@ -166,7 +166,7 @@ var DressApp = React.createClass({
 			product: null,
 			selection: null,
 			authToken: null,
-			loading: true,
+			loading: false,
 			requesting: false
 		};
 	},
@@ -226,7 +226,7 @@ var DressApp = React.createClass({
 			url: this.props.loginUrl,
 			data: data,
 			success: function(data) {
-				this.setState({authToken: data.access_token}, this.getInitialData);
+				this.setState({authToken: data.access_token, loading: true}, this.getInitialData);
 				localStorage.setItem('dress-auth-token', data.access_token);
 				localStorage.setItem('dress-auth-date', new Date().getTime());
 			}.bind(this),
@@ -241,7 +241,7 @@ var DressApp = React.createClass({
 		var authToken = localStorage.getItem('dress-auth-token');
 		var date = localStorage.getItem('dress-auth-date');
 		if (authToken) {
-			this.setState({authToken: authToken}, this.getInitialData);
+			this.setState({authToken: authToken, loading: true}, this.getInitialData);
 		}
 	},
 
