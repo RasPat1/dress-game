@@ -80,7 +80,7 @@ var Product = React.createClass({
 			<h2 className="product__name">{this.props.name}</h2>
 			<div className="product__price">{this.props.price}</div>
 			<ProductImageSet className="product__image-set" imageUrls={this.props.imageUrls} />
-			<div className="product__description" dangerolySetInnerHTML={{__html: this.props.description}}></div>
+			<div className="product__description" dangerouslySetInnerHTML={{__html: this.props.description}}></div>
 		  </div>
 		  );
 	} else {
