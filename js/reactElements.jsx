@@ -310,7 +310,7 @@ var DressApp = React.createClass({
 		var data = {
 			productId: productId,
 			productFeatureId: featureDecision.featureId,
-			decision: featureDecision.decision,
+			decision: featureDecision.decision
 		};
 		return data;
 	},
