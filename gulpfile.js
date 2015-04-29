@@ -6,6 +6,7 @@ var less = require('gulp-less');
 // var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var minifyCSS = require('gulp-minify-css');
+var shell = require('gulp-shell');
 
 gulp.task('default', function() {
     return gulp.src('css/custom.less')
@@ -33,6 +34,14 @@ gulp.task('compress', function() {
 		.pipe(uglify())
 		.pipe(gulp.dest('js/'))
 });
+
+gulp.task('build', ['css-dist', 'compress']);
+gulp.task('copyToS3', ['build'], function() {
+        shell.task([
+                'echo sup'
+            ]);
+});
+gulp.task('deploy', ['copyToS3']);
 
 // Set this up later
 // less compile -> autoprefix -> concatenate -> minifiy
