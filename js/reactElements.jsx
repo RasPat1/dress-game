@@ -319,14 +319,14 @@ var DressApp = React.createClass({
 		// Since we're using props we want explicit control of which values 
 		// go onto the elements to make sure there are no namespacing conflicts.
 		var productProps = {imageUrls: {}}
-		var emptySrc = '';
+		var emptyImageUrl = "//:0";
 		if (data && data.product) {
 			productProps.name = data.product.name;
 			productProps.price = data.product.filterPriceUS;
 			productProps.description = data.product.description;
 			productProps.id = data.product.id;
-			productProps.imageUrls.primary = data.imageUrls.primary ? data.imageUrls.primary : emptySrc;
-			productProps.imageUrls.secondary = data.imageUrls.secondary ? data.imageUrls.secondary : emptySrc;
+			productProps.imageUrls.primary = data.imageUrls.primary ? data.imageUrls.primary : emptyImageUrl;
+			productProps.imageUrls.secondary = data.imageUrls.secondary ? data.imageUrls.secondary : emptyImageUrl;
 		}
 
 		var selectionProps = {};
