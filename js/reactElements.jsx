@@ -167,7 +167,8 @@ var DressApp = React.createClass({
 			selection: null,
 			authToken: null,
 			loading: false,
-			requesting: false
+			requesting: false,
+			productSet: 0
 		};
 	},
 	componentDidMount: function() {
@@ -256,14 +257,17 @@ var DressApp = React.createClass({
 		this.setState({requesting: true});
 		$.ajax({
 			url: this.props.url,
-			data: {count: 30},
+			data: {
+				count: 30,
+				productSet: this.state.productSet
+			},
 			dataType: "json",
 			beforeSend: function (request) {
 				request.setRequestHeader("X-Auth-Token", this.state.authToken);
 			}.bind(this),
 			success: function(data) {
-				callback(data)
-				this.setState({requesting:false})
+				callback(data);
+				this.setState({requesting:false, productSet: this.state.productSet + 1});
 			}.bind(this),
 			statusCode: {
 				401: function() {
