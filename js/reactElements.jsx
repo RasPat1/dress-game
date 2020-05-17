@@ -6,6 +6,7 @@ var mui = require('material-ui'),
 	Paper = mui.Paper,
 	TextField = mui.TextField,
 	Dialog = mui.Dialog,
+    Swipeable = require('react-swipeable'),
 	url = "https://www.shoptiques.com/api/dressGame/interaction",
 	loginUrl = "https://www.shoptiques.com/api/v1/login";
 
@@ -64,7 +65,7 @@ var LoginModal = React.createClass({
 				 hintText="Email" ref="email" type="email" />
   				<TextField className="login-modal__password"
   				 hintText="Password" ref="password" type="password" />
-				<RaisedButton className="login-modal__submit" 
+				<RaisedButton className="login-modal__submit"
 				 label="Log In" secondary={true} />
 			</form>
 		</Paper>
@@ -141,15 +142,14 @@ var Selection = React.createClass({
 		}
 
 		return (
-			<div className="selection">
+            <Swipeable
+                onSwipingLeft={this.swipingLeft},
+                onSwipingRight={this.swipingRight}
+			     <div className="selection">
 				<div className="selection__feature-btn-holder selection__feature-btn-holder--top">
 					{ features }
 				</div>
-				<div className="selection__feature-btn-holder selection__feature-btn-holder--bottom">
-					<FlatButton label="Both" onClick={this.handleClickBoth} key="both" secondary={true} className="selection__feature-btn selection__feature-btn--secondary"/>
-					<FlatButton label="Neither" onClick={this.handleClickNeither} key="neither" primary={true} className="selection__feature-btn selection__feature-btn--secondary"/>
-				</div>
-			</div>
+			</Swipeable>
 		);
 	}
 });
@@ -320,7 +320,7 @@ var DressApp = React.createClass({
 	},
 	setPropObjects: function(data) {
 		// extract the properties we want.
-		// Since we're using props we want explicit control of which values 
+		// Since we're using props we want explicit control of which values
 		// go onto the elements to make sure there are no namespacing conflicts.
 		var productProps = {imageUrls: {}}
 		var emptyImageUrl = "//:0";
@@ -354,6 +354,6 @@ var DressApp = React.createClass({
 });
 
 React.render(
-  <DressApp url={url} loginUrl={loginUrl} />, 
+  <DressApp url={url} loginUrl={loginUrl} />,
   document.getElementById('content')
 );
